@@ -1,0 +1,105 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "totvs_language_debug",
+			"request": "launch",
+			"name": "Depuração do idioma TOTVS",
+			"program": "${command:AskForProgramName}",
+			"cwb": "${workspaceFolder}",
+			"smartclientBin": "C:\\TOTVS\\Protheus\\bin\\smartclient\\smartclient.exe",
+			"isMultiSession": true,
+			"enableTableSync": true
+		}
+	],
+	"lastPrograms": [
+		{
+			"args": [],
+			"label": "u_aula01"
+		},
+		{
+			"args": [],
+			"label": "u_calc"
+		},
+		{
+			"args": [],
+			"label": "u_aula02"
+		},
+		{
+			"label": "sigacf"
+		},
+		{
+			"label": "sigacfg"
+		},
+		{
+			"label": "SIGAESP"
+		},
+		{
+			"label": "sigamdi"
+		},
+		{
+			"label": "u_aula03"
+		},
+		{
+			"args": [],
+			"label": "u_aula03"
+		},
+		{
+			"label": "ADMIN"
+		},
+		{
+			"args": [],
+			"label": "u_zTsExc1"
+		},
+		{
+			"label": "sigaadv"
+		},
+		{
+			"label": "sigacom"
+		},
+		{
+			"label": "sigadv"
+		},
+		{
+			"label": "sigafat"
+		},
+		{
+			"args": [],
+			"label": "u_calcu"
+		},
+		{
+			"args": [],
+			"label": "u_adv"
+		},
+		{
+			"args": [],
+			"label": "u_tetris"
+		},
+		{
+			"args": [],
+			"label": "u_teli"
+		},
+		{
+			"args": [],
+			"label": "u_OMSA010"
+		},
+		{
+			"args": [],
+			"label": "u_ChkExec"
+		},
+		{
+			"args": [],
+			"label": "u_OMSA0"
+		},
+		{
+			"args": [],
+			"label": "u_OMS1"
+		},
+		{
+			"args": [],
+			"label": "U_MAT4"
+		}
+	],
+	"lastProgramExecuted": "u_OMS1",
+	"lastProgramArguments": []
+}
