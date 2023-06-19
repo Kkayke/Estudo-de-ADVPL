@@ -8,9 +8,9 @@ Rotina automatica em tela mvc
 @since   15/06/2023
 @version 1.0
 /*/
-//-------------------------------------------------------------------
+//------------------- ------------------------------------------------
 
-User function OMS1()
+User function OMS1(cProduto)
 
 	Local aErro         := {}
 	Local aProdutos     := {}
@@ -20,34 +20,38 @@ User function OMS1()
 	Local oDA1Mod
 	PRIVATE lMsErroAuto := .F.
 
-	PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
+	If (!IsBlind())
+		PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
+	EndIf
 
-	oModel := FWLoadModel("OMSA010")
+	oModel := FWLoadModel("OMSA010")     //------>Carregando a rotina
 
-	oModel:SetOperation(3)
+	oModel:SetOperation(3)               //------> Operação de inclusão
 
-	oModel:Activate()
+	oModel:Activate()					//-------> Ativando a rotina
 
 	//Array com informações de que sera aplicado nos campos
-	AADD( aProdutos,{"1","1",100.00})
-	AADD( aProdutos,{"1","2",100.00})
+	AADD( aProdutos,{"1",cProduto,85.00})
+	// AADD( aProdutos,{"1","2",23.00})
+	// AADD( aProdutos,{"2","3",37.00})
+	// AADD( aProdutos,{"4","4",12.00})
 
-	//Campos pai
+	//===========Cabeçalho da tabela==================//
 	oDA0Mod := oModel:GetModel("DA0MASTER")
-	oDA0Mod:SetValue("DA0_CODTAB" ,GETSXENUM("DA0","DA0_CODTAB")   )
-	oDA0Mod:SetValue("DA0_DESCRI" , "123")
-	oDA0Mod:SetValue("DA0_DATDE" , Date()  )
-	oDA0Mod:SetValue("DA0_HORADE" , "00:00"   )
-	oDA0Mod:SetValue("DA0_HORATE" , "23:59"  )
-	oDA0Mod:SetValue("DA0_TPHORA" , "1")
-	oDA0Mod:SetValue("DA0_ATIVO" , "1"  )
+	oDA0Mod:SetValue("DA0_CODTAB" ,GETSXENUM("DA0","DA0_CODTAB"))	//-----------> Codigo da Tabela de preço
+	oDA0Mod:SetValue("DA0_DESCRI" , "Produto para Testes")			//-----------> Descrição da tabela
+	oDA0Mod:SetValue("DA0_DATDE" , Date())							//-----------> Data inicial
+	oDA0Mod:SetValue("DA0_HORADE" , "00:00")						//-----------> Hora inicial
+	oDA0Mod:SetValue("DA0_HORATE" , "23:59")						//-----------> Hora final
+	oDA0Mod:SetValue("DA0_TPHORA" , "1")							//-----------> Tipo de hora
+	oDA0Mod:SetValue("DA0_ATIVO" , "1")								//-----------> Se for ativo ou Não
 
-//Campos filhos ja preenchidos com informações dadas no array
+//==============Grid da tabela=======================//
 	oDa1Mod := oModel:GetModel("DA1DETAIL")
-	For x = 1 to Len(aProdutos)
-		oDA1Mod:SetValue("DA1_TIPPRE", aProdutos[z][1])
-		oDA1Mod:SetValue("DA1_ITEM",   StrZero(z,4))
-		oDA1Mod:SetValue("DA1_CODPRO", aProdutos[z][2])
+	For x = 1 to LEN(aProdutos)
+		oDA1Mod:SetValue("DA1_TIPPRE", aProdutos[x][1])				//-----------> Tipo de produto
+		oDA1Mod:SetValue("DA1_CODPRO", aProdutos[x][2])				//-----------> Codigo do produto
+		oDA1Mod:SetValue("DA1_PRCBAS",aProdutos[x][3])				//-----------> Preço base do produto
 
 		//Se conseguir validar as informações
 		If oModel:VldData()
@@ -74,11 +78,13 @@ User function OMS1()
 
 //Se der tudo certo ou algum erro ira aparecer mensagem pro usuario
 	if lOk
-		FWAlertSuccess("Voce é o cara","Protheuzou")
+		FWAlertSuccess("O usuario Fez uma inclusão automatica na tabela de preço " ,"Inclusão automatica com sucesso")
 	else
-		FWAlertError(aErro[6],"Erro vc nao protheouzou")
+		FWAlertError(aErro[6],"Não foi possivel realizar a inclusão na tabela de preço")
 	endif
 
-	RESET ENVIRONMENT
+	If (!IsBlind())
+		RESET ENVIRONMENT
+	EndIf
 
 return(lRet)
