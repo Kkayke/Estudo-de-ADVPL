@@ -98,8 +98,19 @@
 		{
 			"args": [],
 			"label": "U_MAT4"
+		},
+		{
+			"label": "SIGAOMS"
+		},
+		{
+			"args": [],
+			"label": "u_OS010BTN"
+		},
+		{
+			"args": [],
+			"label": "U_PGTESTE"
 		}
 	],
-	"lastProgramExecuted": "u_OMS1",
+	"lastProgramExecuted": "U_PGTESTE",
 	"lastProgramArguments": []
 }
