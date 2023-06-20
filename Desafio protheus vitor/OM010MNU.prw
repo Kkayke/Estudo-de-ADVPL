@@ -8,8 +8,9 @@ Criando um botão para inclusão sem precisa executar direto no fonte
 /*/
 //-------------------------------------------------------------------
 User function OM010MNU()
+	Local cProduto := "1"
 
-	aadd(aRotina,{'Incluir automatico',"u_OMS1",0,3,0,NIL})     //------ Botão que ira aparecer na tabela
+	aadd(aRotina,{'Incluir automatico',"u_OMS1("+cProduto+")",0,3,0,NIL})     //------ Botão que ira aparecer na tabela
 
 
 return

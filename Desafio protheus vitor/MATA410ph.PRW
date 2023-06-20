@@ -1,34 +1,33 @@
 #INCLUDE 'TOTVS.CH'
 #INCLUDE 'TBICONN.CH'
 
+#DEFINE INCLUIR 3
+
 //-------------------------------------------------------------------
-/*/{Protheus.doc} ExecAuto
-Utilizando execAuto para rotina automatica
+/*/{Protheus.doc} MAT4
+Rotina automatica do cadastro do pedidos de venda
 @author  Kayke
 @since 15/06/2023
-@version 1.0
+@version 22.10
 /*/
 //-------------------------------------------------------------------
 User function MAT4()
 	Local x := 0
-	Local aProdutos := {}  // Produtos
-	Local aCabec  := {}    // Cabeçalho
-	Local aItens  := {}    // Grid
+	Local aProdutos := {}
+	Local aCabec  := {}
+	Local aItens  := {}
 	Local aArea   := GetArea()
 	Local aLinhas := {}
-	Local nOpr    := 3     // Tipo de operação que sera realizada( Inclusão )
 	Local lRet := .F.
 	Private lMsErroAuto   := .f.
 
-	//======= Adicionando produtos 1 =========\\
+	//======= Array de produtos =========\\
 	aadd(aProdutos,{"1",10.00,100.00,1000.00,"502"})
-
-	//======= Adicionando produtos 2 ==========\\
 	aaDD(aProdutos,{"2",10.00,100.00,1000.00,"502"})
 
 	PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
 
-	oModel := FWLoadModel("MATA410 ")  //----> Carregando a rotina de pedidos de venda
+	oModel := FWLoadModel("MATA410 ")
 
 	//======= Cabeçalho do pedidos de venda ========\\
 	aadd(aCabec , {"C5_NUM"    , GETSXENUM("SC5","C5_NUM"),}) //-----> Numero do pedido
@@ -38,7 +37,7 @@ User function MAT4()
 	aadd(aCabec , {"C5_LOJAENT", "01"                     ,}) //-----> Loja de entrega
 	aadd(aCabec , {"C5_CONDPAG", "001"                    ,}) //-----> Condição de pagamento
 
-	//Loop que ira fazer um interate com o array, ira buscar informações dadas no array
+	//======= Grid do pedidos de venda ========\\
 	For x = 1 to LEN(aProdutos)
 		aLinhas := {}
 
@@ -49,21 +48,20 @@ User function MAT4()
 		aadd(aLinhas, {"C6_VALOR"  ,aProdutos[x][4],})		  //-----> Valor
 		aadd(aLinhas, {"C6_TES"    ,aProdutos[x][5],})		  //-----> Tipo de saida
 
-		//Transferindo aLinhas para aProdutos
 		AAdd(aItens,aLinhas)
 
 	NEXT
 
-	//========= Começando a inclusão automatica para o usuario ==============\\
-	MsExecAuto({|x, y, z| MATA410(x, y, z)}, aCabec, aItens, nOpr)
+	MsExecAuto({|x, y, z| MATA410(x, y, z)}, aCabec, aItens, INCLUIR)
+
 	//Caso houver erros
 	If (lMsErroAuto)
 		MostraErro()
 		RollBackSX8()
-		ConOut(Repl("-+-", 80))
-		ConOut(PadC("Não foi possivel realizar a inclusão automatica", 80))
-		ConOut(PadC("Execução: " + Time(), 80))
-		ConOut(Repl("-+-", 80))
+		FWLogMsg("INFO",,"FATURAMENTO",,,,Repl("-+-", 80),,,)
+		FWLogMsg("INFO",,"FATURAMENTO",,,,PadC("Não foi possivel realizar a inclusão automatica", 80),,,)
+		FWLogMsg("INFO",,"FATURAMENTO",,,,PadC("Execução: " + Time(), 80),,,)
+		FWLogMsg("INFO",,"FATURAMENTO",,,,Repl("-+-", 80),,,)
 	else
 		ConfirmSX8()
 		FWAlertSuccess("O usuario Fez uma inclusão automatica na tabela de preço ","Inclusão automatica com sucesso")

@@ -24,17 +24,14 @@ User function OMS1(cProduto)
 		PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
 	EndIf
 
-	oModel := FWLoadModel("OMSA010")     //------>Carregando a rotina
+	oModel := FWLoadModel("OMSA010")
 
-	oModel:SetOperation(3)               //------> Operação de inclusão
+	oModel:SetOperation(3)
 
-	oModel:Activate()					//-------> Ativando a rotina
+	oModel:Activate()
 
 	//Array com informações de que sera aplicado nos campos
-	AADD( aProdutos,{"1",cProduto,85.00})
-	// AADD( aProdutos,{"1","2",23.00})
-	// AADD( aProdutos,{"2","3",37.00})
-	// AADD( aProdutos,{"4","4",12.00})
+	AADD( aProdutos,{"1",cValToChar(cProduto),85.00})
 
 	//===========Cabeçalho da tabela==================//
 	oDA0Mod := oModel:GetModel("DA0MASTER")
@@ -53,22 +50,22 @@ User function OMS1(cProduto)
 		oDA1Mod:SetValue("DA1_CODPRO", aProdutos[x][2])				//-----------> Codigo do produto
 		oDA1Mod:SetValue("DA1_PRCBAS",aProdutos[x][3])				//-----------> Preço base do produto
 
-		//Se conseguir validar as informações
+		//Realizando Validação
 		If oModel:VldData()
 
-			//Tenta realizar o Commit
+			//Realizando commit
 			If oModel:CommitData()
 				lOk := .T.
 				ConfirmSX8()
 
-				//Se não deu certo, altera a variável para false aa
+				//Caso houver erro na validação
 			Else
 				lOk := .F.
 				RollBackSX8()
 				aErro := oModel:GetErrorMessage()
 			EndIf
 
-			//Se não conseguir validar as informações, altera a variável para false
+
 		Else
 			lOk := .F.
 			RollBackSX8()
@@ -76,7 +73,7 @@ User function OMS1(cProduto)
 		EndIf
 	next
 
-//Se der tudo certo ou algum erro ira aparecer mensagem pro usuario
+	//Se der certo notificara o usuario com mensagem de sucesso
 	if lOk
 		FWAlertSuccess("O usuario Fez uma inclusão automatica na tabela de preço " ,"Inclusão automatica com sucesso")
 	else

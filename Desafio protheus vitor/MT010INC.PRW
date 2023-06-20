@@ -11,7 +11,7 @@ Após inclusão de um produto no cadastro de produto
 User Function MT010INC()
 	Local aArea := GetArea()
 
-	Local cProduto := M->B1_COD		//----> Pegando Codigo que esta em memory
+	Local cProduto := AllTrim(M->B1_COD)		//----> Pegando Codigo que esta em memory
 
 	u_OMS1(cProduto)				//----> Chamando variavel para a outra User function(Inclusão da tabela de preço)
 
