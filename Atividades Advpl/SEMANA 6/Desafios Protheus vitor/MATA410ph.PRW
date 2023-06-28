@@ -2,75 +2,92 @@
 #INCLUDE 'TBICONN.CH'
 
 //-------------------------------------------------------------------
-/*/{Protheus.doc} ExecAuto
-Utilizando execAuto para rotina automatica
+/*/{Protheus.doc} MAT410
+Rotina automatica do cadastro do pedidos de venda
 @author  Kayke
 @since 15/06/2023
-@version 1.0
+@version 22.10
 /*/
 //-------------------------------------------------------------------
-User function MAT4()
+User function MAT4(oTela,cProduto,nOpr)
 	Local x := 0
-	Local aProdutos := {}  // Produtos
-	Local aCabec  := {}    // Cabeçalho
-	Local aItens  := {}    // Grid
+	Local aProdutos := {}
+	Local aCabec  := {}
+	Local aItens  := {}
 	Local aArea   := GetArea()
 	Local aLinhas := {}
-	Local nOpr    := 3     // Tipo de operação que sera realizada( Inclusão )
-	Local lRet := .F.
+	Local lRet    := .T.
 	Private lMsErroAuto   := .f.
 
-	//======= Adicionando produtos 1 =========\\
-	aadd(aProdutos,{"1",10.00,100.00,1000.00,"502"})
+	//======= Array de produtos =========\\
+	aadd(aProdutos,{cProduto,10.00,100.00,1000.00,"502"})
 
-	//======= Adicionando produtos 2 ==========\\
-	aaDD(aProdutos,{"2",10.00,100.00,1000.00,"502"})
+	If (!IsBlind())
+		PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
+	EndIf
 
-	PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
+	oModel := FWLoadModel("MATA410")
 
-	oModel := FWLoadModel("MATA410 ")  //----> Carregando a rotina de pedidos de venda
+	if nOpr == 3
+		//======= Cabeçalho do pedidos de venda ========\\
+		aadd(aCabec , {"C5_NUM"    , GETSXENUM("SC5","C5_NUM"),}) //-----> Numero do pedido
+		aadd(aCabec , {"C5_TIPO"   , "N"                      ,}) //-----> Tipo do pedido
+		aadd(aCabec , {"C5_CLIENTE", "01"                     ,}) //-----> Cliente do pedido
+		aadd(aCabec , {"C5_LOJACLI", "01"                     ,}) //-----> Loja do cliente
+		aadd(aCabec , {"C5_LOJAENT", "01"                     ,}) //-----> Loja de entrega
+		aadd(aCabec , {"C5_CONDPAG", "001"                    ,}) //-----> Condição de pagamento
 
-	//======= Cabeçalho do pedidos de venda ========\\
-	aadd(aCabec , {"C5_NUM"    , GETSXENUM("SC5","C5_NUM"),}) //-----> Numero do pedido
-	aadd(aCabec , {"C5_TIPO"   , "N"                      ,}) //-----> Tipo do pedido
-	aadd(aCabec , {"C5_CLIENTE", "01"                     ,}) //-----> Cliente do pedido
-	aadd(aCabec , {"C5_LOJACLI", "01"                     ,}) //-----> Loja do cliente
-	aadd(aCabec , {"C5_LOJAENT", "01"                     ,}) //-----> Loja de entrega
-	aadd(aCabec , {"C5_CONDPAG", "001"                    ,}) //-----> Condição de pagamento
+		//======= Grid do pedidos de venda ========\\
+		For x = 1 to LEN(aProdutos)
+			aLinhas := {}
 
-	//Loop que ira fazer um interate com o array, ira buscar informações dadas no array
-	For x = 1 to LEN(aProdutos)
-		aLinhas := {}
+			aadd(aLinhas, {"C6_ITEM "  ,StrZero(x,2)   ,})		  //-----> Item do pedido
+			aadd(aLinhas, {"C6_PRODUTO",aProdutos[x][1],})		  //-----> Produto do pedido
+			aadd(aLinhas, {"C6_QTDVEN" ,aProdutos[x][2],})		  //-----> Quantidade de produtos
+			aadd(aLinhas, {"C6_PRCVEN" ,aProdutos[x][3],})		  //-----> Preço de venda
+			aadd(aLinhas, {"C6_VALOR"  ,aProdutos[x][4],})		  //-----> Valor
+			aadd(aLinhas, {"C6_TES"    ,aProdutos[x][5],})		  //-----> Tipo de saida
 
-		aadd(aLinhas, {"C6_ITEM "  ,StrZero(x,2)   ,})		  //-----> Item do pedido
-		aadd(aLinhas, {"C6_PRODUTO",aProdutos[x][1],})		  //-----> Produto do pedido
-		aadd(aLinhas, {"C6_QTDVEN" ,aProdutos[x][2],})		  //-----> Quantidade de produtos
-		aadd(aLinhas, {"C6_PRCVEN" ,aProdutos[x][3],})		  //-----> Preço de venda
-		aadd(aLinhas, {"C6_VALOR"  ,aProdutos[x][4],})		  //-----> Valor
-		aadd(aLinhas, {"C6_TES"    ,aProdutos[x][5],})		  //-----> Tipo de saida
+			AAdd(aItens,aLinhas)
 
-		//Transferindo aLinhas para aProdutos
-		AAdd(aItens,aLinhas)
+		NEXT
 
-	NEXT
+		MsExecAuto({|x, y, z| MATA410(x, y, z)}, aCabec, aItens, nOpr)
 
-	//========= Começando a inclusão automatica para o usuario ==============\\
-	MsExecAuto({|x, y, z| MATA410(x, y, z)}, aCabec, aItens, nOpr)
-	//Caso houver erros
-	If (lMsErroAuto)
-		MostraErro()
-		RollBackSX8()
-		ConOut(Repl("-+-", 80))
-		ConOut(PadC("Não foi possivel realizar a inclusão automatica", 80))
-		ConOut(PadC("Execução: " + Time(), 80))
-		ConOut(Repl("-+-", 80))
-	else
-		ConfirmSX8()
-		FWAlertSuccess("O usuario Fez uma inclusão automatica na tabela de preço ","Inclusão automatica com sucesso")
 	endif
 
-	RESET ENVIRONMENT
+	if nOpr == 4
+		If	SC5->(MsSeek(xFilial('SC5')+SC5->C5_NUM))
+			DBSetOrder(1)
 
-	RestArea(aArea) // RESTAURAÇÃO DA ÁREA ANTERIOR
+			aadd(aCabec , {"C5_NUM",SC5->C5_NUM,})
+
+			aLinhas := {}
+			aadd(aLinhas, {"C6_ITEM "  ,GETSXENUM("SC6","C6_ITEM"),})
+			aadd(aLinhas, {"C6_PRODUTO",aProdutos[1][1],})		  //-----> Produto do pedido
+			aadd(aLinhas, {"C6_QTDVEN" ,aProdutos[1][2],})		  //-----> Quantidade de produtos
+			aadd(aLinhas, {"C6_PRCVEN" ,aProdutos[1][3],})		  //-----> Preço de venda
+			aadd(aLinhas, {"C6_VALOR"  ,aProdutos[1][4],})		  //-----> Valor
+			aadd(aLinhas, {"C6_TES"    ,aProdutos[1][5],})		  //-----> Tipo de saida
+
+			AAdd(aItens,aLinhas)
+
+			MsExecAuto({|x,y,z| MATA410(x,y,z)},aCabec,aItens,nOpr)
+
+			//Caso houver erros
+			If (lMsErroAuto)
+				MostraErro()
+			else
+				ConfirmSX8()
+				FWAlertSuccess("O usuario Fez uma inclusão automatica de um produto no pedido de venda ","Inclusão automatica com sucesso")
+			endif
+
+			If (!IsBlind())
+				RESET ENVIRONMENT
+			EndIf
+
+			RestArea(aArea) // RESTAURAÇÃO DA ÁREA ANTERIO
+		endif
+	endif
 
 Return(lRet)
