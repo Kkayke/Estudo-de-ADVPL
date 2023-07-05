@@ -10,13 +10,8 @@ Após inclusão de um produto no cadastro de produto
 /*/
 //-------------------------------------------------------------------
 User Function MT010INC()
-	Local aArea := GetArea()
 	Local oFont
 	Local oSay
-
-	If (!IsBlind())
-		PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
-	EndIf
 
 	//=================================Tela que ira dar as opções para o usuario==========================\\
 
@@ -29,15 +24,9 @@ User Function MT010INC()
 
 	oMsDialog:ACTIVATE()
 
-	RestArea(aArea)
-
-	If (!IsBlind())
-		RESET ENVIRONMENT
-	EndIf
-Return(.T.)
+Return
 
 Static function tela1()
-	Local aArea := GetArea()
 	Local cProduto := AllTrim(M->B1_COD)
 	Local nOpr := 4
 	Local oDlg := MSDialog():New(180,180,920,1280,'Tabelas Protheus',,,,,CLR_BLACK,CLR_WHITE,,,.T.)
@@ -56,29 +45,24 @@ Static function tela1()
 	oTela:Activate()
 	oDlg:Activate()
 
-	RestArea(aArea)
-
 return
 
 Static function tela2()
-	Local aArea := GetArea()
 	Local cProduto := AllTrim(M->B1_COD)
-	Local nOpr := 4
-	Local oDlg := MSDialog():New(180,180,920,1280,'Tabelas Protheus',,,,,CLR_BLACK,CLR_WHITE,,,.T.)
+	Local nOpr     := 4
+	Local oDlg     := MSDialog()    :New(180, 180, 920, 1280, 'Tabelas Protheus', , , , , CLR_BLACK, CLR_WHITE, , , .T.)
 	//Criando a markBrowse
-	oTela := FWMarkBrowse():New()
+	oTela          := FWMarkBrowse():New()
 	oTela:SetOwner(oDlg)
 	oTela:AddButton("Confirmar",{||u_MAT4(oTela,cProduto,nOpr)},,3,0)
 	oTela:SetAlias("SC5")
 	oTela:SetUseFilter(.F.)
-	oTela:SetOnlyFields({"C5_NUM","C5_TIPO ","C5_CLIENTE","C5_LOJACLI","C5_LOJAENT","C5_CONDPAG"})
-	oTela:SetDescription("Seleção de cadastro do pedidos de	venda")
-	oTela:SetFieldMark( 'C5_CONOK' )//PEGAR MESMO TAMANHO DE CAMPO DA E1_OK
+	oTela:SetOnlyFields({"C5_NUM"                     , "C5_TIPO ", "C5_CLIENTE", "C5_LOJACLI", "C5_LOJAENT", "C5_CONDPAG"})
+	oTela:SetDescription("Seleção de cadastro do pedidos de venda")
+	oTela:SetFieldMark( 'C5_CONOK' ) //PEGAR MESMO TAMANHO DE CAMPO DA E1_OK
 	oTela:DisableReport()
 
 	oTela:Activate()
 	oDlg:Activate()
-
-	RestArea(aArea)
 
 return

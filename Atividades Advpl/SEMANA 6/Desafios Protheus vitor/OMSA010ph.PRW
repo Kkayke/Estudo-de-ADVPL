@@ -75,8 +75,8 @@ User function OMS1(cProduto,nOpr)
 	endif
 
 	If nOpr == 4
+		DBSetOrder(1)
 		If DA0->(MsSeek(xFilial('DA0')+DA0->DA0_CODTAB))
-			DBSetOrder(1)
 			oDa1Mod := oModel:GetModel("DA1DETAIL")
 			oDa1Mod:Addline()
 			oDa1Mod:SetValue("DA1_CODTAB", aProdutos[1][1])
