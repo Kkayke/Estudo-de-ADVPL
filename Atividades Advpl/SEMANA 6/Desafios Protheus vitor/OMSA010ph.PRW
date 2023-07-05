@@ -1,7 +1,12 @@
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD:Desafio protheus vitor/OMSA010ph.PRW
+>>>>>>> 156c02d199a07062260049be24aed3b38441b711
 #INCLUDE 'TOTVS.CH'
 #INCLUDE "TBICONN.CH"
 
 //-------------------------------------------------------------------
+<<<<<<< HEAD
 /*/{Protheus.doc} OMS1
 Rotina automatica em tela mvc
 @author  Kayke
@@ -11,17 +16,32 @@ Rotina automatica em tela mvc
 //------------------- ------------------------------------------------
 
 User function OMS1(cProduto,nOpr)
+=======
+/*/{Protheus.doc} ExecAuto em MVC
+Rotina automatica em tela mvc
+@author  Kayke
+@since   15/06/2023
+@version 1.0
+/*/
+//------------------- ------------------------------------------------
+
+User function OMS1(cProduto)
+>>>>>>> 156c02d199a07062260049be24aed3b38441b711
 
 	Local aErro         := {}
 	Local aProdutos     := {}
 	Local x             := 0
 	Local lRet          := .f.
+<<<<<<< HEAD
 	local lOk			:= .F.
+=======
+>>>>>>> 156c02d199a07062260049be24aed3b38441b711
 	Local oDA0Mod
 	Local oDA1Mod
 	PRIVATE lMsErroAuto := .F.
 
 	If (!IsBlind())
+<<<<<<< HEAD
 		PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'	//Array com informações de que sera aplicado nos campos
 	ENDIF
 
@@ -66,11 +86,52 @@ User function OMS1(cProduto,nOpr)
 				EndIf
 
 				//Se não conseguir validar as informações, altera a variável para false
+=======
+		PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
+	EndIf
+
+	oModel := FWLoadModel("OMSA010")
+
+	oModel:SetOperation(3)
+
+	oModel:Activate()
+
+	//Array com informações de que sera aplicado nos campos
+	AADD( aProdutos,{"1",cValToChar(cProduto),85.00})
+
+	//===========Cabeçalho da tabela==================//
+	oDA0Mod := oModel:GetModel("DA0MASTER")
+	oDA0Mod:SetValue("DA0_CODTAB" ,GETSXENUM("DA0","DA0_CODTAB"))	//-----------> Codigo da Tabela de preço
+	oDA0Mod:SetValue("DA0_DESCRI" , "Produto para Testes")			//-----------> Descrição da tabela
+	oDA0Mod:SetValue("DA0_DATDE" , Date())							//-----------> Data inicial
+	oDA0Mod:SetValue("DA0_HORADE" , "00:00")						//-----------> Hora inicial
+	oDA0Mod:SetValue("DA0_HORATE" , "23:59")						//-----------> Hora final
+	oDA0Mod:SetValue("DA0_TPHORA" , "1")							//-----------> Tipo de hora
+	oDA0Mod:SetValue("DA0_ATIVO" , "1")								//-----------> Se for ativo ou Não
+
+//==============Grid da tabela=======================//
+	oDa1Mod := oModel:GetModel("DA1DETAIL")
+	For x = 1 to LEN(aProdutos)
+		oDA1Mod:SetValue("DA1_TIPPRE", aProdutos[x][1])				//-----------> Tipo de produto
+		oDA1Mod:SetValue("DA1_CODPRO", aProdutos[x][2])				//-----------> Codigo do produto
+		oDA1Mod:SetValue("DA1_PRCBAS",aProdutos[x][3])				//-----------> Preço base do produto
+
+		//Realizando Validação
+		If oModel:VldData()
+
+			//Realizando commit
+			If oModel:CommitData()
+				lOk := .T.
+				ConfirmSX8()
+
+				//Caso houver erro na validação
+>>>>>>> 156c02d199a07062260049be24aed3b38441b711
 			Else
 				lOk := .F.
 				RollBackSX8()
 				aErro := oModel:GetErrorMessage()
 			EndIf
+<<<<<<< HEAD
 		next
 	endif
 
@@ -106,6 +167,20 @@ User function OMS1(cProduto,nOpr)
 	//Se der tudo certo ou algum erro ira aparecer mensagem pro usuario
 	if lOk
 		FWAlertSuccess("O usuario Adicionou um produto na tabela de preço " ,"Produto incluido com sucesso")
+=======
+
+
+		Else
+			lOk := .F.
+			RollBackSX8()
+			aErro := oModel:GetErrorMessage()
+		EndIf
+	next
+
+	//Se der certo notificara o usuario com mensagem de sucesso
+	if lOk
+		FWAlertSuccess("O usuario Fez uma inclusão automatica na tabela de preço " ,"Inclusão automatica com sucesso")
+>>>>>>> 156c02d199a07062260049be24aed3b38441b711
 	else
 		FWAlertError(aErro[6],"Não foi possivel realizar a inclusão na tabela de preço")
 	endif
@@ -115,3 +190,98 @@ User function OMS1(cProduto,nOpr)
 	EndIf
 
 return(lRet)
+<<<<<<< HEAD
+=======
+=======
+#INCLUDE 'TOTVS.CH'
+#INCLUDE "TBICONN.CH"
+
+//-------------------------------------------------------------------
+/*/{Protheus.doc} ExecAuto em MVC
+Rotina automatica em tela mvc
+@author  Kayke
+@since   15/06/2023
+@version 1.0
+/*/
+//------------------- ------------------------------------------------
+
+User function OMS1(cProduto)
+
+	Local aErro         := {}
+	Local aProdutos     := {}
+	Local x             := 0
+	Local lRet          := .f.
+	Local oDA0Mod
+	Local oDA1Mod
+	PRIVATE lMsErroAuto := .F.
+
+	If (!IsBlind())
+		PREPARE ENVIRONMENT EMPRESA '99' FILIAL '01'
+	EndIf
+
+	oModel := FWLoadModel("OMSA010")     //------>Carregando a rotina
+
+	oModel:SetOperation(3)               //------> Operação de inclusão
+
+	oModel:Activate()					//-------> Ativando a rotina
+
+	//Array com informações de que sera aplicado nos campos
+	AADD( aProdutos,{"1",cProduto,85.00})
+	// AADD( aProdutos,{"1","2",23.00})
+	// AADD( aProdutos,{"2","3",37.00})
+	// AADD( aProdutos,{"4","4",12.00})
+
+	//===========Cabeçalho da tabela==================//
+	oDA0Mod := oModel:GetModel("DA0MASTER")
+	oDA0Mod:SetValue("DA0_CODTAB" ,GETSXENUM("DA0","DA0_CODTAB"))	//-----------> Codigo da Tabela de preço
+	oDA0Mod:SetValue("DA0_DESCRI" , "Produto para Testes")			//-----------> Descrição da tabela
+	oDA0Mod:SetValue("DA0_DATDE" , Date())							//-----------> Data inicial
+	oDA0Mod:SetValue("DA0_HORADE" , "00:00")						//-----------> Hora inicial
+	oDA0Mod:SetValue("DA0_HORATE" , "23:59")						//-----------> Hora final
+	oDA0Mod:SetValue("DA0_TPHORA" , "1")							//-----------> Tipo de hora
+	oDA0Mod:SetValue("DA0_ATIVO" , "1")								//-----------> Se for ativo ou Não
+
+//==============Grid da tabela=======================//
+	oDa1Mod := oModel:GetModel("DA1DETAIL")
+	For x = 1 to LEN(aProdutos)
+		oDA1Mod:SetValue("DA1_TIPPRE", aProdutos[x][1])				//-----------> Tipo de produto
+		oDA1Mod:SetValue("DA1_CODPRO", aProdutos[x][2])				//-----------> Codigo do produto
+		oDA1Mod:SetValue("DA1_PRCBAS",aProdutos[x][3])				//-----------> Preço base do produto
+
+		//Se conseguir validar as informações
+		If oModel:VldData()
+
+			//Tenta realizar o Commit
+			If oModel:CommitData()
+				lOk := .T.
+				ConfirmSX8()
+
+				//Se não deu certo, altera a variável para false aa
+			Else
+				lOk := .F.
+				RollBackSX8()
+				aErro := oModel:GetErrorMessage()
+			EndIf
+
+			//Se não conseguir validar as informações, altera a variável para false
+		Else
+			lOk := .F.
+			RollBackSX8()
+			aErro := oModel:GetErrorMessage()
+		EndIf
+	next
+
+//Se der tudo certo ou algum erro ira aparecer mensagem pro usuario
+	if lOk
+		FWAlertSuccess("O usuario Fez uma inclusão automatica na tabela de preço " ,"Inclusão automatica com sucesso")
+	else
+		FWAlertError(aErro[6],"Não foi possivel realizar a inclusão na tabela de preço")
+	endif
+
+	If (!IsBlind())
+		RESET ENVIRONMENT
+	EndIf
+
+return(lRet)
+>>>>>>> 2d4703c7ac21561276056c5d9282eb1582a529ba:Atividades Advpl/SEMANA 6/Desafios Protheus vitor/OMSA010ph.PRW
+>>>>>>> 156c02d199a07062260049be24aed3b38441b711
